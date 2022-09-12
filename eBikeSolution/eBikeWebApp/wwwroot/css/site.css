@@ -1,0 +1,34 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.team-logo {
+    width: 100px;
+}
+
+.login1, .login2 {
+    padding-top: 62.5px;
+}
+
+.login3, .login4 {
+    padding-top: 55.5px;
+}
+
+.login1, .login3 {
+    padding-left: 20px;
+}

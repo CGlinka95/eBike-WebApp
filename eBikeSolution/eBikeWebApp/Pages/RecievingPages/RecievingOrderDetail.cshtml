@@ -1,0 +1,198 @@
+﻿@page
+@model eBikeWebApp.Pages.RecievingPages.RecievingOrderDetailModel
+@{
+    ViewData["title"] = "Recieve Order";
+}
+ 
+@section CustomCSS{
+    <partial name="ReceivingOrderDetailsgCSS" />
+}
+<script>
+    function onForceCloseClick(){
+        let text = "Are you sure you want to force close?"
+
+     
+    }
+ 
+</script>
+<main>
+    @if(Model.order == null)
+    {
+        <h1>Unfornetly, Purchase Order ID was not supplied or Purchase Order doesn't exist with supplied Purchase Order ID</h1>
+        
+        <p>
+            <a href="/RecievingPages/Recieving">click here</a>  to head back to Recieving main page
+        </p>
+    }
+    else
+    {
+        @if (Model.ErrorDetails.Count() != 0)
+        {
+            <blockquote class="error-messages">
+                @Model.ErrorMessage
+                <ul>
+                    @foreach(var detail in Model.ErrorDetails)
+                    {
+                        <li>@detail</li>
+                    }
+                </ul>
+            </blockquote>
+        }
+        <h2>Purchase Order info: </h2>
+         <ul>
+             <li>Purchase OrderID: @Model.order.PurchaseOrderID</li>
+             <li>Vendor: @Model.order.VendorName</li>
+             <li>Contact Phone: <a href="tel:@Model.order.PhoneNumber">@Model.order.PhoneNumber</a> </li>
+         </ul>
+        <h3>Recievable items</h3>
+         <form method="post">
+        <table>
+            <thead>
+            <tr>
+                <th>PartID</th>
+                <th>Description</th>
+                <th>O/Qty</th>
+                <th>O.Std</th>
+                <th>RecQty</th>
+                <th>Return</th>
+                <th>Return Reason</th>           
+            </tr>
+        </thead>
+        <tbody>
+             <input type="hidden" value="@Model.order.PurchaseOrderID" asp-for="OrderId"/>
+                    @{
+                        int counter = 0;
+                    }
+                    @foreach( var order in Model.orderDetails)
+                    {
+                                    // This right here is so that data is saved when page is reloaded
+                                    int rec = 0;
+                                    int returnQty = 0;
+                                    string returnReason = "";
+                                    try
+                                    {
+                                        rec = Model.recQty[counter] ?? 0;
+                                        returnQty = Model.returnQty[counter] ?? 0;
+                                        returnReason = Model.reasons[counter] ?? "";
+
+                                    }       
+                                    catch(NullReferenceException ex)
+                                    {
+                                        rec = 0;
+                                        returnQty = 0;
+                                        returnReason = "";
+                                    }
+                                    catch(ArgumentOutOfRangeException ex)
+                                    {
+                                        rec =  0;
+                                        returnQty = 0;
+                                        returnReason = "";
+                                    }
+
+                        
+                        <tr>
+                            <td  hidden="hidden">
+                                @*<I could make the recievedItems Part ID not the index best practices?" />*@
+                                <input type="hidden" value="@order.PartID" name="recievedItems.Index"/>
+                                <input type="hidden" value="@order.PurchaseOrderDetailID" name="recievedItems[@order.PartID].PurchaseOrderDetailID" />
+                                <input type="hidden" value="@order.OutStandingQty" name="recievedItems[@order.PartID].QuantityOutStanding"/>
+                                <input type="hidden" value="@order.PartDescription" name="recievedItems[@order.PartID].PartDescription"/>
+                                <input type="hidden" value="@order.PartID" name="recievedItems[@order.PartID].PartID"/>
+                                
+                            
+                            </td>
+                            <td>@order.PartID</td> 
+                            <td>@order.PartDescription</td>
+                            <td>@order.OustandingQtyOriginal</td>
+                            <td>@order.OutStandingQty</td>
+                            <td>
+                                <input class="recQty" type="number" placeholder="TBD" min="0" 
+                               value="@rec"
+    
+                                name="recievedItems[@order.PartID].QuantityRecieved" />
+                            </td>
+
+                             <td>
+                              
+                                <input class="recQty" type="number" placeholder="TBD" min="0" 
+                                value="@returnQty"
+                                name="recievedItems[@order.PartID].QuantityReturned" />
+                            </td>
+                            <td>
+                                <input class="return-reason" type="text" placeholder="" 
+                                value="@returnReason"
+                                name="recievedItems[@order.PartID].ReturnReason"/>
+                            </td>
+                        </tr>
+                         counter++;
+                    }
+
+        </tbody>
+        </table>
+             <h3> Unordered Items</h3>
+             <table>
+                 <thead>
+                     <th>Delete/Insert/Clear</th>
+                     <th>Item Description</th>
+                     <th>Vendor Part ID</th>
+                     <th>Qty</th>
+                 </thead>
+                 <tbody>
+                    @foreach(var item in Model.UnOrderedItems)
+                    {
+                        <tr>
+                            <td>
+                                <button id="delete" asp-page-handler="DeleteUnorderedItem" value="@item.CardID" name="CartID" >Delete</button>
+                            </td>
+                            <td>
+                                @item.Description
+
+                            </td>
+                            <td>
+                                @item.VendorPartNumber
+                            </td>
+                            <td>
+                                @item.Quantity
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td>
+                            
+                            <button id="insert-clear" asp-page-handler="InsertUnorderedItem" >Insert</button>
+                            <button asp-page-handler="ClearUnOrderedItem" id="insert-clear" class="button" >Clear</button>
+
+                            
+                        </td>
+                        <td>
+                            <input  name="UnorderedDescription" type="text" placeholder="Car Engine"/>
+                        </td>
+                        <td>
+                            <input  name="UnorderedVendorNumber" type="text" placeholder="E0sjsl"/>
+
+                        </td>
+                        <td>
+                            <input  name="UnorderedQuantity" type="number" min="0" placeholder="0"/>
+                        </td>
+                    </tr>
+                </tbody>
+             </table>
+        <div>
+
+            <button id="recieve" asp-page-handler="Recieve" >Recieve</button>
+            <div class="force-close">
+
+                <button  class="button" onclick="return confirm('Are you sure you want to force close this order?')"
+                asp-page-handler="ForceClose">Force Close</button>
+                <input class="yes-test" type="text" placeholder="Reason for closing" asp-for="ForceCloseReason" />
+            </div>
+        </div>
+    </form>
+
+    <form>
+
+    </form>
+    }
+   
+   
+ </main>

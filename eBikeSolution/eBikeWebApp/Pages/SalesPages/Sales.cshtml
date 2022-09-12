@@ -1,0 +1,93 @@
+﻿@page "{CategoryID?}/{PartID?}"
+@model eBikeWebApp.Pages.SalesPages.SalesModel
+@{
+	ViewData["Title"]="Sales";
+}
+<h1>Sales</h1>
+<h2>Welcome, @Model.EmployeeName</h2>
+
+@section CustomCSS{
+    <partial name="_MyCustomCSS" />
+}
+
+<form method="post">
+	<label>
+		Category
+		<select asp-for="CategoryID">
+			<option>Select Category...</option>
+			@foreach(var item in Model.CategoryList){
+				if(Model.CategoryID == item.ValueID)
+				{
+					<option value="@item.ValueID" selected>@item.DisplayText</option>
+				}
+				else
+				{
+					<option value="@item.ValueID">@item.DisplayText</option>
+				}
+			}
+		</select>
+	</label>
+	<label>
+		<button type="submit" asp-page-handler="GetParts">
+			Get Parts
+		</button>
+	</label>
+	@if(Model.CategoryID != null)
+	{
+		<label>
+			Part
+			<select asp-for="PartID">
+				<option>Select Part...</option>
+				@foreach(var item in Model.PartList){
+					if(Model.PartID == item.ValueID)
+					{
+						<option value="@item.ValueID" selected>@item.DisplayText</option>
+					}
+					else
+					{
+						<option value="@item.ValueID">@item.DisplayText</option>
+					}
+				}
+			</select>
+		</label>
+		<label>
+		<button type="submit" asp-page-handler="AddPart">
+			+ Add
+		</button>
+	</label>
+	}
+	else
+	{
+		<p>Choose a category</p>
+	}
+
+
+<table border="1">
+	<thead>
+		<tr>
+			<td>Item</td>
+			<td>Qty</td>
+			<td>Price</td>
+			<td>Total</td>
+		</tr>
+	</thead>
+	@if(Model.Part != null)
+	{
+		<tbody>
+			@foreach(var item in Model.Part)
+			{
+				<tr>
+					<td>@item.Description</td>
+					<td></td>
+					<td>@item.SellingPrice</td>
+					<td></td>
+				</tr>
+			}
+		</tbody>
+	}
+</table>
+
+
+	<br /><br /><br />
+	<button type="submit" name="Refunds" formaction="/SalesPages/Refunds">Refunds</button>
+</form>

@@ -1,0 +1,285 @@
+﻿@page "{EmployeeID?}/{VendorID?}"
+@model eBikeWebApp.Pages.PurchasingPages.PurchasingModel
+@{
+    ViewData["Title"] = "Purchasing";
+}
+@section CustomCSS{
+<partial name="PurchasingCSS" />
+}
+
+<h1>Purchasing</h1>
+<h2>Welcome, @Model.EmployeeName</h2>
+
+@if (Model.HasFeedBack)
+{
+    <p class="feedback">@Model.FeedbackMessage</p>
+}
+@if (Model.HasError)
+{
+    <blockquote class="error">
+        @Model.ErrorMessage
+        <ul>
+            @foreach (var detail in Model.ErrorDetails)
+            {
+                <li>@detail</li>
+            }
+        </ul>
+    </blockquote>
+}
+
+<section class="flex">
+    <form method="POST" class="vendors flex">
+        <div class="vendor-search flex oneHalf">
+            <label>
+                Vendor
+                <select asp-for="VendorID">
+                    <option>Select a Vendor...</option>
+                    @*Foreach loop here to populate the list of vendors*@
+                    @foreach (var vendor in Model.VendorList)
+                    {
+                        if (vendor.ValueID == Model.VendorID)
+                        {
+                            <option value="@vendor.ValueID" selected>@vendor.DisplayText</option>
+                        }
+                        else
+                        {
+                            <option value="@vendor.ValueID">@vendor.DisplayText</option>
+                        }
+                    }
+                </select>
+            </label>
+            <footer>
+                <button type="submit" asp-page-handler="FindOrder">
+                    Find Order
+                </button>
+            </footer>
+        </div>
+        <div class="vendor-info flex oneHalf">
+            @if (Model.Vendor == null)
+            {
+                <p>Phone:</p>
+                <p>City:</p>
+                <p>PO #:</p>
+            }
+            else
+            {
+                <p>Phone: @Model.Vendor.Phone</p>
+                <p>City: @Model.Vendor.City</p>
+
+                @if (Model.PurchaseOrder != null && Model.PurchaseOrder.PurchaseOrderNumber.HasValue)
+                {
+                    <p>PO #: @Model.PurchaseOrder.PurchaseOrderNumber</p>
+                }
+                else
+                {
+                    <p>PO #: New Order</p>
+                }
+            }
+        </div>
+    </form>
+</section>
+
+<section>
+    <form method="POST">
+        <div class="form-controls">
+            @if (Model.Vendor != null)
+            {
+                @if (Model.PurchaseOrder != null && Model.PurchaseOrder.PurchaseOrderNumber.HasValue)
+                {
+                    <button type="submit" asp-page-handler="SaveOrder" class="form-control"
+                    style="background-color:blue;">
+                        Save Order
+                    </button>
+                    <input type="hidden" name="PurchaseOrder.PurchaseOrderNumber" value="@Model.PurchaseOrder.PurchaseOrderNumber" />
+                    <input type="hidden" name="PurchaseOrder.PurchaseOrderID" value="@Model.PurchaseOrder.PurchaseOrderID" />
+                }
+                else
+                {
+                    <button type="submit" asp-page-handler="NewOrder" class="form-control"
+                    style="background-color:blue;">
+                        New Order
+                    </button>
+                }
+                @if (Model.PurchaseOrder != null && Model.PurchaseOrder.PurchaseOrderNumber.HasValue)
+                {
+                    <button type="submit" asp-page-handler="PlaceOrder" class="form-control"
+                    onclick="return confirm('An order can not be edited after being placed. Ensure all changes are correct before proceding.')">
+                        Place Order
+                    </button>
+                    <button type="submit" asp-page-handler="DeleteOrder" class="form-control"
+                    style="background-color:var(--danger-color);"
+                    onclick="return confirm('Are you sure you want to delete this order?')">
+                        Delete Order
+                    </button>
+                }
+                else
+                {
+                    <button type="submit" asp-page-handler="PlaceOrder" class="form-control" disabled>
+                        Place Order
+                    </button>
+                    <button type="submit" asp-page-handler="DeleteOrder" class="form-control delete"
+                    style="background-color:var(--danger-color);" disabled>
+                        Delete Order
+                    </button>
+                }
+                <button type="submit" asp-page-handler="Clear" class="form-control"
+                    style="background-color:grey;"
+                    onclick="return confirm('Are you sure you want to clear the current order?')">
+                    Clear
+                </button>
+            }
+        </div>
+        <div class="order-values flex">
+            @if (Model.VendorID > 0)
+            {
+                <p>SubTotal:</p>
+                <input type="text" value="@Math.Round(Model.subtotal, 2)" readonly />
+                <p>GST:</p>
+                <input type="text" value="@Math.Round(Model.gst, 2)" readonly />
+                <p>Total:</p>
+                <input type="text" value="@Math.Round(Model.total, 2)" readonly />
+            }
+        </div>
+        @if (Model.VendorID.HasValue && Model.VendorID > 0)
+        {
+            <div class="flex table-display">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Description</th>
+                            <th>QOH</th>
+                            <th>QOO</th>
+                            <th>ROL</th>
+                            <th>Buffer</th>
+                            <th>Price ($)</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var vendorItem in Model.VendorInventory)
+                        {
+                            <tr>
+                                <td>
+                                    <input type="hidden" name="VendorInventory.Index" value="@vendorItem.PartID" />
+                                    <input type="hidden" name="VendorInventory[@vendorItem.PartID].PartID"
+                                   value="@vendorItem.PartID" />
+                                    @vendorItem.PartID
+                                </td>
+                                <td>
+                                    <input type="hidden" name="VendorInventory[@vendorItem.PartID].Description"
+                                   value="@vendorItem.Description" />
+                                    @vendorItem.Description
+                                </td>
+                                <td>
+                                    <input type="hidden" name="VendorInventory[@vendorItem.PartID].QuantityOnHand"
+                                   value="@vendorItem.QuantityOnHand" />
+                                    @vendorItem.QuantityOnHand
+                                </td>
+                                <td>
+                                    <input type="hidden" name="VendorInventory[@vendorItem.PartID].QuantityOnOrder"
+                                   value="@vendorItem.QuantityOnOrder" />
+                                    @vendorItem.QuantityOnOrder
+                                </td>
+                                <td>
+                                    <input type="hidden" name="VendorInventory[@vendorItem.PartID].ReorderLevel"
+                                   value="@vendorItem.ReorderLevel" />
+                                    @vendorItem.ReorderLevel
+                                </td>
+                                <td>
+                                    <input type="hidden" name="VendorInventory[@vendorItem.PartID].Buffer"
+                                   value="@vendorItem.Buffer" />
+                                    @vendorItem.Buffer
+                                </td>
+                                <td>
+                                    <input type="hidden" name="VendorInventory[@vendorItem.PartID].PurchasePrice"
+                                   value="@vendorItem.PurchasePrice" />
+                                    @Math.Round(vendorItem.PurchasePrice, 2)
+                                </td>
+                                <td>
+                                    <button type="submit" name="vendorPartToMove" value="@vendorItem.PartID"
+                                    asp-page-handler="AddVendorItem">
+                                        <i class="las la-plus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>ID</th>
+                            <th>Description</th>
+                            <th>QOH</th>
+                            <th>QOO</th>
+                            <th>ROL</th>
+                            <th>QTO</th>
+                            <th>Price ($)</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var orderItem in Model.CurrentOrder)
+                        {
+                            <tr>
+                                <td>
+                                    <button type="submit" class="delete-button" name="partToMove" value="@orderItem.PartID"
+                                    style="background-color:var(--danger-color)" asp-page-handler="RemoveOrderItem">
+                                        <i class="las la-trash"></i>
+                                    </button>
+                                </td>
+                                <td>
+                                    <input type="hidden" name="CurrentOrder.Index" value="@orderItem.PartID" />
+                                    <input type="hidden" name="CurrentOrder[@orderItem.PartID].PartID"
+                                   value="@orderItem.PartID" />
+                                    <input type="hidden" name="CurrentOrder[@orderItem.PartID].PurchaseOrderDetailID"
+                                   value="@orderItem.PurchaseOrderDetailID" />
+                                    @orderItem.PartID
+                                </td>
+                                <td>
+                                    <input type="hidden" name="CurrentOrder[@orderItem.PartID].Description"
+                                   value="@orderItem.Description" />
+                                    @orderItem.Description
+                                </td>
+                                <td>
+                                    <input type="hidden" name="CurrentOrder[@orderItem.PartID].QuantityOnHand"
+                                   value="@orderItem.QuantityOnHand" />
+                                    @orderItem.QuantityOnHand
+                                </td>
+                                <td>
+                                    <input type="hidden" name="CurrentOrder[@orderItem.PartID].QuantityOnOrder"
+                                   value="@orderItem.QuantityOnOrder" />
+                                    @orderItem.QuantityOnOrder
+                                </td>
+                                <td>
+                                    <input type="hidden" name="CurrentOrder[@orderItem.PartID].ReorderLevel"
+                                   value="@orderItem.ReorderLevel" />
+                                    @orderItem.ReorderLevel
+                                </td>
+                                <td>
+                                    <input type="number" min="1" max="1000" step="1"
+                                   name="CurrentOrder[@orderItem.PartID].QuantityToOrder"
+                                   value="@orderItem.QuantityToOrder" />
+                                </td>
+                                <td>
+                                    <input type="number" min="1" max="1000" step="0.01"
+                                   name="CurrentOrder[@orderItem.PartID].PurchasePrice"
+                                   value="@Math.Round(orderItem.PurchasePrice, 2)" />
+                                </td>
+                                <td>
+                                    <button type="submit" class="refresh-button" asp-page-handler="RefreshOrderItem"
+                                    style="background-color:blue;">
+                                        <i class="las la-redo-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </form>
+</section>
+

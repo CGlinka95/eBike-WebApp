@@ -1,0 +1,75 @@
+﻿{
+   "CodeGenerationMode": 2,
+   "ContextClassName": "ServicingDbContext",
+   "ContextNamespace": null,
+   "DefaultDacpacSchema": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "ModelNamespace": null,
+   "OutputContextPath": "DAL",
+   "OutputPath": "Entities",
+   "ProjectRootNamespace": "ServicingSystem",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 0,
+   "SelectedToBeGenerated": 0,
+   "Tables": [
+      {
+         "Name": "[dbo].[Categories]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Coupons]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Customers]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[CustomerVehicles]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Employees]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[JobDetailParts]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[JobDetails]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Jobs]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Parts]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[StandardJobs]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": "DESKTOP-L94HR1D.eBike_DMIT2018",
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": true,
+   "UseDbContextSplitting": false,
+   "UseFluentApiOnly": false,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoConstructor": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UseSchemaFolders": false,
+   "UseSpatial": false
+}

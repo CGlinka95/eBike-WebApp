@@ -1,0 +1,43 @@
+﻿@page
+@model eBikeWebApp.Pages.PurchasingPages.indexModel
+@{
+    ViewData["Title"] = "Purchasing System";
+}
+@section CustomCSS{
+    <partial name="PurchasingCSS" />
+}
+
+<section class="textCenter">
+    <div>
+        <h1>Purchasing System for eBikes repair shop!</h1>
+        <a asp-area="" asp-page="/PurchasingPages/Purchasing">Purchasing System</a>
+    </div>
+    <div class="flex twoHalves">
+        <div class="oneHalf">
+            <h2>System Specifications</h2>
+            <p>The following is a list of functionalities for the Purchasing Subsystem</p>
+            <ul>
+                <li>There must be a logged on user to access the Purchasing Subsystem.</li>
+                <li>The user can select a Vendor from a dropdown list.</li>
+                <li>
+                    Once a Vendor is selected, pressing Find Order will query the OMST database for any active purchase orders for the specified Vendor.
+                </li>
+                <li>An active order is one with an Order Date of NULL in the database, meaning that it has not yet been placed.</li>
+                <li>The Vendor information (Phone and City) will be displayed along with the PO number if there is an active order.</li>
+                <li>Two tables will be displayed:</li>
+                <li>- The first table is the Vendor Inventory</li>
+                <li>- The second table is the Current Active order that is being edited</li>
+                <li>The user may add items to the order from the Vendor Inventory, or remove items from the Current Order.</li>
+                <li>Pressing Save Order will update the current state of the order on the database for future updates.</li>
+                <li>Pressing Place Order will set the Order Date of the order to the current date and update each Part's QuantityOnOrder field.</li>
+                <li>The user may Delete the current order from the database.</li>
+                <li>The Clear button will clear the entire page including which Vendor was previously selected, allowing for the creation of a new order.</li>
+            </ul>
+        </div>
+        <div class="oneHalf">
+            <h2>Known Bugs</h2>
+            <p>The thing is ... I use dark mode on my computer because light mode attracts bugs.</p>
+            <p>Therefore ... I have no bugs!</p>
+        </div>
+    </div>
+</section>

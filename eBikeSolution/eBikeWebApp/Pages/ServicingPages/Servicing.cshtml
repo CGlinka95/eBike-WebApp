@@ -1,0 +1,280 @@
+﻿@page "{employeeID?}/{searchArg?}/{customerID?}/{vehicleIdentification?}"
+@model eBikeWebApp.Pages.ServicingPages.ServicingModel
+@{
+	ViewData["Title"] = "Servicing";
+}
+<h1>Servicing</h1>
+<h2>Welcome, @Model.EmployeeName</h2>
+
+@section CustomCSS{
+<partial name="_ServicingCustomCSS" />
+}
+
+<h1>New Job</h1>
+
+@if (Model.HasFeedBack)
+{
+	<blockquote class="success">@Model.FeedBackMessage</blockquote>
+}
+
+@if (Model.HasError)
+{
+	<blockquote class="error">
+		@Model.ErrorMsg
+		<ul>
+			@foreach (var detail in Model.ErrorDetails)
+			{
+				<li>@detail</li>
+			}
+		</ul>
+	</blockquote>
+}
+
+<form method="post" id="GetVehicleID" asp-page-handler="SelectedCustomerVehicle"></form>
+
+<section>
+	<form method="post">
+		<section class="setflex gap">
+			<div class="oneThird">
+				<div>
+					@if (Model.ListServicesInfo.Count == 0)
+					{
+						<button type="submit" asp-page-handler="Clear" formnovalidate
+							onclick="return confirm('Are you sure that you want to clear this job service?')">
+							Clear
+						</button>
+						<button type="submit" asp-page-handler="Save" disabled>Register Job</button>
+					}
+					else
+					{
+						<button type="submit" asp-page-handler="Clear" formnovalidate
+							onclick="return confirm('Are you sure that you want to clear this job service?')">
+							Clear
+						</button>
+						<button type="submit" asp-page-handler="Save">Register Job</button>
+					}
+				</div>
+
+				<label>
+					Customer: @Model.CustomerName
+					<input type="text"
+						   asp-for="searchArg"
+						   placeholder="Smith" />
+					<button class="full marginTop"
+							type="submit"
+							asp-page-handler="CustomerSearch"
+							title="Fetch Customer">
+						Search
+					</button>
+				</label>
+
+				@if (!string.IsNullOrWhiteSpace(Model.searchArg))
+				{
+					if (Model.CustomerByName.Count() == 0)
+					{
+						<p style="color:firebrick; font-weight:bold;">There is no customer by that name on file.</p>
+					}
+					else
+					{
+						<table class="marginTop" border="1">
+							<thead>
+								<tr>
+									<th class="tenPercent"></th>
+									<th>Name</th>
+									<th>Phone</th>
+									<th>Address</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var item in Model.CustomerByName)
+								{
+									<tr>
+										<td>
+											<input type="hidden"
+									   value="@item.CustomerID"
+									   asp-for="customerID">
+											<button type="submit"
+										title="Select this customer"
+										asp-page-handler="SelectedCustomerVehicle">
+												<i class="las la-eye"></i>
+											</button>
+										</td>
+										<td>@item.FullName</td>
+										<td>@item.Phone</td>
+										<td>@item.Address</td>
+									</tr>
+								}
+							</tbody>
+							<tfoot>
+								<tr>
+									<td colspan="4">
+										@{
+											foreach (var pageRef in Model.Pager)
+											{
+												if (pageRef == Model.Pager.CurrentPage)
+												{
+													<b>@pageRef.Text</b>
+												}
+												else
+												{
+													<a title="Page @pageRef.Page"
+								   asp-page="/ServicingPages/Servicing"
+								   asp-route-currentPage="@pageRef.Page">
+														@pageRef.Text
+													</a>
+												}
+											}
+										}
+									</td>
+								</tr>
+							</tfoot>
+						</table>
+					}
+				}
+				<label>
+					Vin: @Model.vehicleIdentification
+					<input type="hidden" name="vehicleIdentification" value="@Model.vehicleIdentification" />
+					<select asp-for="vehicleIdentification"
+							onchange="this.form.submit()"
+							form="GetVehicleID">
+						<option value="0">Select a vehicle...</option>
+						@foreach (var item in Model.CustomerVehicleList)
+						{
+							if (Model.vehicleIdentification == item.VIN)
+							{
+								<option value="@item.VIN" selected>@item.MakeModel</option>
+							}
+							else
+							{
+								<option value="@item.VIN">@item.MakeModel</option>
+							}
+						}
+					</select>
+				</label>
+			</div>
+
+			<div class="oneHalf">
+				<div class="setflex gap">
+					<button class="oneHalf" type="submit" asp-page-handler="ListServiceInfo">Add</button>
+					<button class="oneHalf" type="reset">Reset</button>
+				</div>
+
+				<label>
+					Service:
+					<input type="text"
+						   asp-for="serviceDescription"
+						   placeholder="Oil Change" />
+					<span asp-validation-for="serviceDescription"></span>
+				</label>
+
+				<div class="setflex gap">
+					<label class="oneHalf">
+						Std Service:
+						<select asp-for="standardJobID">
+							<option value="0">Select a service...</option>
+							@foreach (var item in Model.StandardJobList)
+							{
+								if (Model.standardJobID == item.StandardJobID)
+								{
+									<option value="@item.StandardJobID" selected>@item.StandardDescription</option>
+								}
+								else
+								{
+									<option value="@item.StandardJobID">@item.StandardDescription</option>
+								}
+							}
+						</select>
+					</label>
+
+					<label class="oneHalf">
+						Hours:
+						<div class="setflex">
+							<input class="oneQuarter"
+								   type="number"
+								   min="0.00"
+								   step="0.100"
+								   asp-for="serviceHours" />
+							<span asp-validation-for="serviceHours"></span>
+							<span class="paddingLeft">Shop Rate: $50.00</span>
+						</div>
+					</label>
+				</div>
+
+				<label>
+					Comment:
+					<textarea asp-for="customerComments"
+							  placeholder="Customer comment here...">
+					</textarea>
+				</label>
+
+				<label>
+					Coupon
+					<input type="text"
+						   asp-for="couponIDValue"
+						   placeholder="Enter valid coupon value..." />
+				</label>
+
+				<label>
+					Labour Est.:
+				</label>
+
+				<p>(Parts are extra)</p>
+
+			</div>
+
+			<div class="oneHalf">
+				@if (Model.ListServicesInfo.Count == 0)
+				{
+					<p style="color:firebrick; font-weight:bold;">There are no services added to this vehicle yet.</p>
+				}
+				else
+				{
+					<table border="1">
+						<thead>
+							<tr>
+								<th></th>
+								<th>Service</th>
+								<th>Hrs</th>
+								<th>Comment</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var item in Model.ListServicesInfo)
+							{
+								<tr>
+									<td>
+										<input type="hidden" name="ListServicesInfo.Index"
+									   value="@item.ServiceDescription">
+										<input type="hidden" name="ListServicesInfo[@item.ServiceDescription].ServiceDescription"
+									   value="@item.ServiceDescription">
+										<input type="hidden" name="ListServicesInfo[@item.ServiceDescription].CouponIDValue"
+									   value="@item.CouponIDValue">
+										<button type="submit"
+										title="Delete this service"
+										asp-page-handler="DeleteServiceListItem">
+											<i class="las la-trash"></i>
+										</button>
+									</td>
+									<td>
+										@item.ServiceDescription
+									</td>
+									<td>
+										<input type="hidden" name="ListServicesInfo[@item.ServiceDescription].ServiceHours"
+									   value="@item.ServiceHours">
+										@item.ServiceHours
+									</td>
+									<td class="full">
+										<input type="hidden" name="ListServicesInfo[@item.ServiceDescription].CustomerComments"
+									   value="@item.CustomerComments">
+										@item.CustomerComments
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				}
+			</div>
+
+		</section>
+	</form>
+</section>

@@ -1,0 +1,27 @@
+﻿@page
+@model eBikeWebApp.Pages.ServicingPages.IndexModel
+@{
+	ViewData["Title"]="Servicing";
+}
+
+@section CustomCSS{
+    <partial name="_MyCustomCSS" />
+}
+
+<section>
+    <div class="textCenter">
+        <h1>Servicing System for eBikes repair shop!</h1>
+        <a asp-area="" asp-page="/ServicingPages/Servicing">Servicing System</a>
+    </div>
+    <div class="setflex">
+        <div class="oneHalf">
+            <h2 class="textCenter">System Specifications</h2>
+        </div>
+        <div class="oneHalf">
+            <h2 class="textCenter">Known Bugs</h2>
+            <ul>
+                <li>None! :)</li>
+            </ul>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,53 @@
+﻿@page
+@model eBikeWebApp.Pages.RecievingPages.RecievingModel
+@{
+	ViewData["Title"]="Recieving";
+}
+
+    <h1>Receiving</h1>
+    <h3>Welcome @Model.EmployeeName</h3>
+
+  @if(Model.outStandingOrders == null )
+    {
+        <p>There are no outstanding orders: </p>
+    }
+    else
+    {
+        <h2>Recieving </h2>
+   @if(Model.FeedBackMessage != null)
+        {
+            <blockquote>@Model.FeedBackMessage</blockquote>
+        }
+        <table>
+        <thead>
+            <tr>
+                <th>PO#</th>
+                <th>Date</th>
+                <th>Vendor</th>
+                <th>Contact</th>
+                <th>View Order</th>
+            
+            </tr>
+        </thead>
+        <tbody>
+                <form method="post">
+           
+                @foreach(var order in Model.outStandingOrders)
+                {
+                    <tr>
+                        <td>@order.PurchaseOrderID</td>
+                        <td>@order.OrderDate.ToString() </td>
+                        <td>@order.VendorName</td>
+                        <td>@order.PhoneNumber</td>
+      
+                        <td>
+                            <button name="PurchaseOrderID" id="insert-clear" value="@order.PurchaseOrderID" asp-page-handler="ViewOrder" >View Order</button>
+                        </td>
+                      
+                    </tr>
+                }
+            </form>
+        </tbody>
+    </table>
+    
+ }
